@@ -15,7 +15,7 @@ jobs:
 
     - name: Clone Element X Android
       run: |
-        git clone --depth 1 --branch main https://github.com/element-hq/element-x-android element-x-android
+        git clone --depth 1 --branch release/26.06.1 https://github.com/element-hq/element-x-android element-x-android
         cd element-x-android
 
     - name: Apply IM rebrand patch
@@ -38,16 +38,17 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x element-x-android/gradlew
 
-    - name: Build with Gradle
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        gradle-version: wrapper
-        build-root-directory: element-x-android
-
-    - name: Assemble debug APK
+    - name: Downgrade Gradle to stable 8.11.1
       run: |
         cd element-x-android
-        ./gradlew assembleDebug --no-daemon --stacktrace --info 2>&1 | tee build.log || (tail -200 build.log && exit 1)
+        sed -i 's|gradle-9.2.1-bin.zip|gradle-8.11.1-bin.zip|' gradle/wrapper/gradle-wrapper.properties
+        sed -i 's|distributionSha256Sum=.*|distributionSha256Sum=daea786a4f3c3963d2f71b46a651f7a94497252b97ccbcafe37d03aba48a3fd2|' gradle/wrapper/gradle-wrapper.properties
+        grep "distributionUrl" gradle/wrapper/gradle-wrapper.properties
+
+    - name: Assemble debug APK
+      working-directory: element-x-android
+      run: |
+        ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log || (tail -500 build.log && exit 1)
         echo "==> APK files:"
         find app/build/outputs/apk -name "*.apk" -ls
 
