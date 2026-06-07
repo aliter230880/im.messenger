@@ -38,13 +38,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x element-x-android/gradlew
 
-    - name: Downgrade Gradle to stable 8.11.1
-      run: |
-        cd element-x-android
-        sed -i 's|gradle-9.2.1-bin.zip|gradle-8.11.1-bin.zip|' gradle/wrapper/gradle-wrapper.properties
-        sed -i 's|distributionSha256Sum=.*|distributionSha256Sum=f397b287023acdba1e9f6fc5ea72d22dd63669d59ed4a289a29b1a76eee151c6|' gradle/wrapper/gradle-wrapper.properties
-        grep "distributionUrl" gradle/wrapper/gradle-wrapper.properties
-
     - name: Assemble debug APK
       working-directory: element-x-android
       run: |
