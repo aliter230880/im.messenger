@@ -1,0 +1,54 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Element X Android
+      uses: actions/checkout@v4
+      with:
+        repository: element-hq/element-x-android
+        ref: main
+
+    - name: Apply IM rebrand patch
+      run: |
+        git apply <<'PATCH'
+        diff --git a/plugins/src/main/kotlin/config/BuildTimeConfig.kt b/plugins/src/main/kotlin/config/BuildTimeConfig.kt
+        index original..patched 100644
+        --- a/plugins/src/main/kotlin/config/BuildTimeConfig.kt
+        +++ b/plugins/src/main/kotlin/config/BuildTimeConfig.kt
+        @@ -10,8 +10,8 @@ package config
+         
+         object BuildTimeConfig {
+        -    const val APPLICATION_ID = "io.element.android.x"
+        -    const val APPLICATION_NAME = "Element X"
+        +    const val APPLICATION_ID = "space.aliterra.im"
+        +    const val APPLICATION_NAME = "IM"
+             const val GOOGLE_APP_ID_RELEASE = "1:912726360885:android:d097de99a4c23d2700427c"
+             const val GOOGLE_APP_ID_DEBUG = "1:912726360885:android:def0a4e454042e9b00427c"
+             const val GOOGLE_APP_ID_NIGHTLY = "1:912726360885:android:e17435e0beb0303000427c"
+        PATCH
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
+    - name: Build debug APK
+      run: ./gradlew assembleDebug --no-daemon
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
