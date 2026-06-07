@@ -21,7 +21,9 @@ jobs:
     - name: Apply IM rebrand patch
       run: |
         cd element-x-android
-        git apply ../rebrand.patch
+        sed -i 's/const val APPLICATION_ID = "io.element.android.x"/const val APPLICATION_ID = "space.aliterra.im"/' plugins/src/main/kotlin/config/BuildTimeConfig.kt
+        sed -i 's/const val APPLICATION_NAME = "Element X"/const val APPLICATION_NAME = "IM"/' plugins/src/main/kotlin/config/BuildTimeConfig.kt
+        grep -A2 "object BuildTimeConfig" plugins/src/main/kotlin/config/BuildTimeConfig.kt
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
