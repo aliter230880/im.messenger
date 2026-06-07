@@ -15,7 +15,7 @@ jobs:
 
     - name: Clone Element X Android
       run: |
-        git clone --depth 1 --branch release/26.06.1 https://github.com/element-hq/element-x-android element-x-android
+        git clone --depth 1 --branch v26.06.1 https://github.com/element-hq/element-x-android element-x-android
         cd element-x-android
 
     - name: Apply IM rebrand patch
